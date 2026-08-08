@@ -12,7 +12,7 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
 from langchain_groq import ChatGroq
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, ToolMessage
 from langgraph.graph import StateGraph, START, MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
 from tools import tools
@@ -21,10 +21,9 @@ Path("data").mkdir(exist_ok=True)
 
 
 # Update default and allowed models to use Groq chat models
-DEFAULT_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+DEFAULT_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 
 ALLOWED_MODELS = {
-    "llama-3.3-70b-versatile",
     "llama-3.1-8b-instant",
     "mixtral-8x7b-32768",
     "gemma2-9b-it",
@@ -38,19 +37,17 @@ You are a helpful Agentic AI assistant named ChiruGPT similar to ChatGPT.
 You can:
 1. Answer normal questions.
 2. Use tools when needed.
-3. Search uploaded documents using the RAG tool.
-4. Search the web for latest/current information using Tavily Search.
-5. Remember important user information using the memory tool.
-6. Recall memory when useful.
-7. Use calculator for math.
+3. Search uploaded documents when the user asks about files they uploaded.
+4. Search the web for latest/current information.
+5. Remember important user information.
+6. Recall saved memory when useful.
+7. Do math calculations.
 
 Rules:
-- If the user asks about latest news, current events, recent updates, today's information, current prices, current people, current versions, new releases, or anything time-sensitive, use Tavily Search.
-- If the user asks about an uploaded document, use search_uploaded_documents.
-- If the user asks you to remember something, use remember_this.
-- If the user asks about previous preferences or saved facts, use recall_memory.
-- Use calculator for math questions.
-- When using web search, summarize clearly and mention that the answer is based on web search results.
+- Use the most appropriate available tool when a tool is needed.
+- When using retrieved tool output, answer directly from that output.
+- Do not invent function-call syntax in plain text.
+- If you already received tool results in the current turn, answer directly from those results and do not call the same tool again.
 - Be clear, helpful, and concise.
 """
 
@@ -93,7 +90,10 @@ def build_agent(model_name: str):
     def chatbot_node(state: MessagesState):
         messages = [SystemMessage(content=SYSTEM_PROMPT)] + state["messages"]
 
-        response = llm_with_tools.invoke(messages)
+        if state["messages"] and isinstance(state["messages"][-1], ToolMessage):
+            response = llm.invoke(messages)
+        else:
+            response = llm_with_tools.invoke(messages)
 
         return {
             "messages": [response]

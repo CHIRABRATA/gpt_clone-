@@ -4,7 +4,7 @@
       "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
       "title": "Search the web for latest AI agent news.",
       "created_at": "2026-08-08T18:16:25.913823",
-      "updated_at": "2026-08-08T18:25:52.947442"
+      "updated_at": "2026-08-08T18:37:05.393032"
     }
   ],
   "chat_messages": [
@@ -85,6 +85,84 @@
       "role": "user",
       "content": "what the content in the document?",
       "created_at": "2026-08-08T18:25:52.947442"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "2+2?",
+      "created_at": "2026-08-08T18:29:45.178112"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "The answer is 4.",
+      "created_at": "2026-08-08T18:29:46.757383"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "gave latest new",
+      "created_at": "2026-08-08T18:30:02.230711"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "I'm not able to access the latest news as the API key is missing or invalid. However, I can suggest some general news topics or provide information on a specific topic if you're interested. Please let me know how I can assist you further.",
+      "created_at": "2026-08-08T18:30:08.451843"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "gave latest new",
+      "created_at": "2026-08-08T18:35:37.696705"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "Here are the latest news headlines:\n\n1. Hungary's Ruling Party Nominates Former Supreme Court Head Baka as President\n2. The UAE Says Iranian Missile Targeted a Ship, Yemen Attacks Houthis and Other Middle East News\n3. Drones Spotted Above German Military Base Two Days After Suspected Drone Attack\n4. British Columbia District Declares State of Emergency, Issues Evacuation Orders as Wildfire Rages\n5. Leaders of Serbia and Ukraine Pledge Closer Economic Ties\n6. Iran Says Deal on Strait of Hormuz Is Close but Will Not Open the Waterway by Itself\n7. 'Mom, Don't Call Me': Inside Thailand's Deadly School Shooting\n8. Bulgaria's Radev Says Drone Exploded in Bulgaria's Airspace\n9. Thailand School Shooting Toll Rises to Nine After Death of 12-Year-Old Girl, Police Say\n10. UAE Says Iran Attacked ADNOC Vessel With Missile in Strait of Hormuz\n\nThese are just a few of the latest news headlines from around the world.",
+      "created_at": "2026-08-08T18:35:48.456256"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "burdwan news today",
+      "created_at": "2026-08-08T18:36:08.299749"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "burdwan news today",
+      "created_at": "2026-08-08T18:36:23.665626"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "burdwan news today",
+      "created_at": "2026-08-08T18:36:33.860043"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "hii",
+      "created_at": "2026-08-08T18:36:45.553313"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "h",
+      "created_at": "2026-08-08T18:36:59.530578"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "It seems like we're having a conversation, but I didn't receive any specific question or topic from you. Would you like to ask me something or discuss a particular topic?",
+      "created_at": "2026-08-08T18:37:00.604862"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "burdwan news today",
+      "created_at": "2026-08-08T18:37:05.393032"
     }
   ],
   "long_term_memory": []

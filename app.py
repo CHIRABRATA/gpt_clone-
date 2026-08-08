@@ -230,7 +230,7 @@ async def chat_stream(request: Request):
 
     user_message = data.get("message", "")
     thread_id = data.get("thread_id", "default")
-    selected_model = data.get("model", "llama-3.3-70b-versatile")
+    selected_model = data.get("model", "llama-3.1-8b-instant")
 
     if not user_message.strip():
         return JSONResponse(
