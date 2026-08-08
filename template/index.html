@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>chiruGPT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, Arial, Helvetica, sans-serif;
+            background: #212121;
+            color: #ececec;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 270px;
+            background: #171717;
+            border-right: 1px solid #2f2f2f;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 700;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .new-chat {
+            border: 1px solid #3f3f3f;
+            background: transparent;
+            color: #ececec;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .new-chat:hover {
+            background: #2a2a2a;
+        }
+
+        .history-title {
+            color: #999;
+            font-size: 13px;
+            margin: 10px 0;
+            padding-left: 4px;
+        }
+
+        #conversationList {
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-radius: 8px;
+            color: #cfcfcf;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item:hover {
+            background: #2a2a2a;
+        }
+
+        .history-item.active {
+            background: #303030;
+            color: #ffffff;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #212121;
+        }
+
+        .topbar {
+            height: 56px;
+            border-bottom: 1px solid #2f2f2f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .status {
+            font-size: 13px;
+            color: #aaa;
+            font-weight: 400;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 20px 150px;
+        }
+
+        .welcome {
+            max-width: 760px;
+            margin: 110px auto 0;
+            text-align: center;
+        }
+
+        .welcome h1 {
+            font-size: 34px;
+            margin-bottom: 10px;
+            font-weight: 650;
+        }
+
+        .welcome p {
+            color: #aaa;
+            font-size: 16px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 760px;
+            margin: 30px auto;
+        }
+
+        .card {
+            border: 1px solid #3a3a3a;
+            border-radius: 14px;
+            padding: 16px;
+            color: #ccc;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .card:hover {
+            background: #2a2a2a;
+        }
+
+        .message {
+            max-width: 820px;
+            margin: 0 auto 28px;
+            display: flex;
+            gap: 12px;
+            line-height: 1.65;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
+        }
+
+        .message.user .avatar {
+            order: 2;
+        }
+
+        .message.user .message-content {
+            order: 1;
+            background: #303030;
+            border: 1px solid #3f3f3f;
+            border-radius: 18px 18px 4px 18px;
+            padding: 12px 16px;
+            max-width: 70%;
+        }
+
+        .message.assistant .message-content {
+            background: transparent;
+            padding: 0;
+            max-width: 75%;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .user-avatar {
+            background: #5a4fcf;
+        }
+
+        .bot-avatar {
+            background: #10a37f;
+        }
+
+        .message-content {
+            color: #ececec;
+            font-size: 16px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .tool-progress {
+            max-width: 820px;
+            margin: 0 auto 14px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .tool-progress-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #2a2a2a;
+            border: 1px solid #3f3f3f;
+            color: #cfcfcf;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        .tool-spinner {
+            width: 13px;
+            height: 13px;
+            border: 2px solid #555;
+            border-top: 2px solid #10a37f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .tool-check {
+            color: #10a37f;
+            font-weight: bold;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 270px;
+            right: 0;
+            background: linear-gradient(to top, #212121 82%, transparent);
+            padding: 24px 20px;
+        }
+
+        .input-wrapper {
+            max-width: 820px;
+            margin: 0 auto;
+            background: #303030;
+            border: 1px solid #444;
+            border-radius: 18px;
+            display: flex;
+            align-items: flex-end;
+            padding: 12px;
+            box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+        }
+
+        .attach-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: #cfcfcf;
+            cursor: pointer;
+            font-size: 20px;
+            margin-right: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .attach-btn:hover {
+            background: #3a3a3a;
+            color: #ffffff;
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            resize: none;
+            color: #ececec;
+            font-size: 16px;
+            min-height: 30px;
+            max-height: 170px;
+            line-height: 1.5;
+            padding: 7px;
+        }
+
+        textarea::placeholder {
+            color: #aaa;
+        }
+
+        .model-select {
+            height: 40px;
+            max-width: 135px;
+            background: #262626;
+            color: #ececec;
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 0 8px;
+            margin-left: 8px;
+            outline: none;
+            font-size: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .model-select:hover {
+            background: #333333;
+        }
+
+        .model-select option {
+            background: #262626;
+            color: #ececec;
+        }
+
+        .mic-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: #cfcfcf;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .mic-btn:hover {
+            background: #3a3a3a;
+            color: #ffffff;
+        }
+
+        .mic-btn.recording {
+            background: #ef4444;
+            color: #ffffff;
+            animation: pulseMic 1.2s infinite;
+        }
+
+        @keyframes pulseMic {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: none;
+            background: #ececec;
+            color: #111;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            background: #ffffff;
+        }
+
+        .send-btn:disabled {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+        }
+
+        .notice {
+            color: #aaa;
+            font-size: 12px;
+            max-width: 820px;
+            margin: 8px auto 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .input-area {
+                left: 0;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .message.user .message-content,
+            .message.assistant .message-content {
+                max-width: 82%;
+            }
+
+            .model-select {
+                max-width: 95px;
+                font-size: 11px;
+                padding: 0 6px;
+            }
+
+            .mic-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+                margin-left: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+    <div class="brand">BappyGPT</div>
+
+    <button class="new-chat" onclick="newChat()">+ New chat</button>
+
+    <div class="history-title">Recent Chats</div>
+    <div id="conversationList"></div>
+</aside>
+
+<main class="main">
+    <div class="topbar">
+        <div>Agentic AI Chatbot</div>
+        <div class="status" id="status">Ready</div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="welcome" id="welcome">
+            <h1>How can I help you today?</h1>
+            <p>Ask questions, upload documents, use tools, search the web, and chat with memory.</p>
+        </div>
+
+        <div class="cards" id="cards">
+            <div class="card" onclick="usePrompt('Search the web for latest AI agent news.')">
+                Search latest web info
+            </div>
+
+            <div class="card" onclick="usePrompt('Summarize the document I uploaded.')">
+                Summarize uploaded document
+            </div>
+
+            <div class="card" onclick="usePrompt('Remember that my channel name is dswithbappy.')">
+                Save something to memory
+            </div>
+
+            <div class="card" onclick="usePrompt('Calculate 125 * 48 / 6')">
+                Use calculator tool
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-wrapper">
+
+            <input
+                type="file"
+                id="fileInput"
+                style="display: none;"
+                accept=".pdf,.docx,.txt,.md,.py,.csv"
+                onchange="uploadFile()"
+            >
+
+            <button class="attach-btn" onclick="openFilePicker()" title="Upload document">
+                📎
+            </button>
+
+            <textarea
+                id="messageInput"
+                placeholder="Ask anything..."
+                rows="1"
+                oninput="autoResize(this)"
+                onkeydown="handleKeyDown(event)"
+            ></textarea>
+
+            <select id="modelSelect" class="model-select" title="Select model">
+                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+            </select>
+
+            <button class="mic-btn" id="micBtn" onclick="toggleDictation()" title="Dictate">
+                🎙️
+            </button>
+
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">➜</button>
+        </div>
+
+        <div class="notice" id="noticeText">
+            BappyGPT can make mistakes. Check important info.
+        </div>
+    </div>
+</main>
+
+<script>
+    const chatContainer = document.getElementById("chatContainer");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusText = document.getElementById("status");
+    const conversationList = document.getElementById("conversationList");
+    const modelSelect = document.getElementById("modelSelect");
+    const noticeText = document.getElementById("noticeText");
+    const micBtn = document.getElementById("micBtn");
+
+    let threadId = localStorage.getItem("thread_id");
+
+    if (!threadId) {
+        threadId = crypto.randomUUID();
+        localStorage.setItem("thread_id", threadId);
+    }
+
+    const savedModel = localStorage.getItem("selected_model");
+
+    if (savedModel && modelSelect) {
+        modelSelect.value = savedModel;
+    }
+
+    if (modelSelect) {
+        modelSelect.addEventListener("change", () => {
+            localStorage.setItem("selected_model", modelSelect.value);
+
+            if (noticeText) {
+                noticeText.textContent = `Selected model: ${modelSelect.value}`;
+            }
+        });
+    }
+
+    let recognition = null;
+    let isDictating = false;
+
+    function setupSpeechRecognition() {
+        const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            return null;
+        }
+
+        const speechRecognition = new SpeechRecognition();
+
+        speechRecognition.lang = "en-US";
+        speechRecognition.continuous = true;
+        speechRecognition.interimResults = true;
+
+        speechRecognition.onstart = () => {
+            isDictating = true;
+
+            if (micBtn) {
+                micBtn.classList.add("recording");
+                micBtn.textContent = "⏹️";
+            }
+
+            statusText.textContent = "Listening...";
+        };
+
+        speechRecognition.onresult = (event) => {
+            let finalTranscript = "";
+            let interimTranscript = "";
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + " ";
+                } else {
+                    interimTranscript += transcript;
+                }
+            }
+
+            if (finalTranscript) {
+                const currentText = messageInput.value.trim();
+
+                messageInput.value = currentText
+                    ? currentText + " " + finalTranscript.trim()
+                    : finalTranscript.trim();
+
+                autoResize(messageInput);
+            }
+
+            if (interimTranscript && noticeText) {
+                noticeText.textContent = "Listening: " + interimTranscript;
+            }
+        };
+
+        speechRecognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+
+            if (event.error === "not-allowed") {
+                alert("Microphone permission denied. Please allow microphone access.");
+            }
+
+            stopDictation();
+        };
+
+        speechRecognition.onend = () => {
+            if (isDictating) {
+                try {
+                    speechRecognition.start();
+                } catch (error) {
+                    stopDictation();
+                }
+            }
+        };
+
+        return speechRecognition;
+    }
+
+    function toggleDictation() {
+        if (!recognition) {
+            recognition = setupSpeechRecognition();
+        }
+
+        if (!recognition) {
+            alert("Speech recognition is not supported in this browser. Please use Chrome or Edge.");
+            return;
+        }
+
+        if (isDictating) {
+            stopDictation();
+        } else {
+            startDictation();
+        }
+    }
+
+    function startDictation() {
+        try {
+            recognition.start();
+        } catch (error) {
+            console.error("Could not start dictation:", error);
+        }
+    }
+
+    function stopDictation() {
+        isDictating = false;
+
+        if (recognition) {
+            try {
+                recognition.stop();
+            } catch (error) {
+                console.error("Could not stop dictation:", error);
+            }
+        }
+
+        if (micBtn) {
+            micBtn.classList.remove("recording");
+            micBtn.textContent = "🎙️";
+        }
+
+        statusText.textContent = "Ready";
+
+        if (noticeText) {
+            noticeText.textContent = "BappyGPT can make mistakes. Check important info.";
+        }
+
+        messageInput.focus();
+    }
+
+    function autoResize(textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    function hideWelcome() {
+        const welcome = document.getElementById("welcome");
+        const cards = document.getElementById("cards");
+
+        if (welcome) welcome.style.display = "none";
+        if (cards) cards.style.display = "none";
+    }
+
+    function handleKeyDown(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+
+    function usePrompt(text) {
+        messageInput.value = text;
+        autoResize(messageInput);
+        messageInput.focus();
+    }
+
+    function openFilePicker() {
+        document.getElementById("fileInput").click();
+    }
+
+    function addMessage(role, content = "") {
+        hideWelcome();
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = role === "user"
+            ? "message user"
+            : "message assistant";
+
+        const avatar = document.createElement("div");
+        avatar.className = role === "user"
+            ? "avatar user-avatar"
+            : "avatar bot-avatar";
+
+        avatar.textContent = role === "user" ? "U" : "AI";
+
+        const messageContent = document.createElement("div");
+        messageContent.className = "message-content";
+        messageContent.textContent = content;
+
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(messageContent);
+
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        return messageContent;
+    }
+
+    function detectLikelyTool(message) {
+        const text = message.toLowerCase();
+
+        const mathPattern = /(\d+\s*[\+\-\*\/]\s*\d+)|calculate|calculation|math|solve/;
+        const ragPattern = /document|pdf|file|uploaded|summarize|summary|according to|based on/;
+        const memorySavePattern = /remember that|save this|store this|keep in memory|memorize/;
+        const memoryRecallPattern = /what do you remember|recall|my memory|remember about me/;
+
+        const webSearchPattern =
+            /latest|current|today|now|recent|news|search web|web search|internet|online|price|version|update|2025|2026|who is|what is happening|trending|release|new model|current ceo|latest version/;
+
+        if (memorySavePattern.test(text)) {
+            return "Memory Save";
+        }
+
+        if (memoryRecallPattern.test(text)) {
+            return "Memory Recall";
+        }
+
+        if (ragPattern.test(text)) {
+            return "Document Search";
+        }
+
+        if (webSearchPattern.test(text)) {
+            return "Web Search";
+        }
+
+        if (mathPattern.test(text)) {
+            return "Calculator";
+        }
+
+        return null;
+    }
+
+    function addToolProgress(toolName) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "tool-progress";
+
+        const box = document.createElement("div");
+        box.className = "tool-progress-box";
+
+        const icon = document.createElement("span");
+        icon.className = "tool-spinner";
+
+        const text = document.createElement("span");
+        text.textContent = `Using ${toolName}...`;
+
+        box.appendChild(icon);
+        box.appendChild(text);
+        wrapper.appendChild(box);
+
+        chatContainer.appendChild(wrapper);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+        return {
+            wrapper,
+            icon,
+            text
+        };
+    }
+
+    function completeToolProgress(toolProgress, toolName) {
+        if (!toolProgress) return;
+
+        toolProgress.icon.className = "tool-check";
+        toolProgress.icon.textContent = "✓";
+        toolProgress.text.textContent = `${toolName} completed`;
+    }
+
+    async function loadConversations() {
+        try {
+            const response = await fetch("/conversations");
+            const data = await response.json();
+
+            conversationList.innerHTML = "";
+
+            if (!data.conversations || data.conversations.length === 0) {
+                conversationList.innerHTML = `
+                    <div class="history-item">No chats yet</div>
+                `;
+                return;
+            }
+
+            data.conversations.forEach(conv => {
+                const item = document.createElement("div");
+                item.className = "history-item";
+
+                if (conv.thread_id === threadId) {
+                    item.classList.add("active");
+                }
+
+                item.textContent = conv.title || "New Chat";
+                item.onclick = () => loadConversation(conv.thread_id);
+
+                conversationList.appendChild(item);
+            });
+
+        } catch (error) {
+            console.error("Failed to load conversations:", error);
+        }
+    }
+
+    async function loadConversation(selectedThreadId) {
+        threadId = selectedThreadId;
+        localStorage.setItem("thread_id", threadId);
+
+        try {
+            const response = await fetch(`/history/${threadId}`);
+            const data = await response.json();
+
+            chatContainer.innerHTML = "";
+
+            if (!data.messages || data.messages.length === 0) {
+                renderWelcome();
+                await loadConversations();
+                return;
+            }
+
+            data.messages.forEach(msg => {
+                addMessage(
+                    msg.role === "user" ? "user" : "assistant",
+                    msg.content
+                );
+            });
+
+            await loadConversations();
+
+        } catch (error) {
+            console.error("Failed to load conversation:", error);
+        }
+    }
+
+    function renderWelcome() {
+        chatContainer.innerHTML = `
+            <div class="welcome" id="welcome">
+                <h1>How can I help you today?</h1>
+                <p>Ask questions, upload documents, use tools, search the web, and chat with memory.</p>
+            </div>
+
+            <div class="cards" id="cards">
+                <div class="card" onclick="usePrompt('Search the web for latest AI agent news.')">
+                    Search latest web info
+                </div>
+
+                <div class="card" onclick="usePrompt('Summarize the document I uploaded.')">
+                    Summarize uploaded document
+                </div>
+
+                <div class="card" onclick="usePrompt('Remember that my channel name is dswithbappy.')">
+                    Save something to memory
+                </div>
+
+                <div class="card" onclick="usePrompt('Calculate 125 * 48 / 6')">
+                    Use calculator tool
+                </div>
+            </div>
+        `;
+    }
+
+    function parseSSEPart(part) {
+        const lines = part
+            .split(/\r?\n/)
+            .filter(line => line.trim().startsWith("data:"));
+
+        if (lines.length === 0) {
+            return null;
+        }
+
+        const jsonText = lines
+            .map(line => line.replace(/^data:\s*/, ""))
+            .join("\n")
+            .trim();
+
+        if (!jsonText || jsonText === "[DONE]") {
+            return null;
+        }
+
+        try {
+            return JSON.parse(jsonText);
+        } catch (error) {
+            console.error("Invalid stream JSON:", jsonText, error);
+            return null;
+        }
+    }
+
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+
+        if (!message) return;
+
+        if (isDictating) {
+            stopDictation();
+        }
+
+        const selectedModel = modelSelect ? modelSelect.value : "gemini-2.5-flash";
+
+        addMessage("user", message);
+
+        messageInput.value = "";
+        messageInput.style.height = "auto";
+
+        sendBtn.disabled = true;
+        statusText.textContent = `Thinking with ${selectedModel}...`;
+
+        const likelyTool = detectLikelyTool(message);
+        let toolProgress = null;
+
+        if (likelyTool) {
+            toolProgress = addToolProgress(likelyTool);
+            statusText.textContent = `Using ${likelyTool}...`;
+        }
+
+        const botElement = addMessage("assistant", "");
+
+        let firstTokenReceived = false;
+
+        function handleStreamData(data) {
+            if (!data) return;
+
+            if (data.token !== undefined && data.token !== null) {
+                if (!firstTokenReceived) {
+                    firstTokenReceived = true;
+
+                    if (likelyTool && toolProgress) {
+                        completeToolProgress(toolProgress, likelyTool);
+                    }
+
+                    statusText.textContent = `Generating with ${selectedModel}...`;
+                }
+
+                botElement.textContent += data.token;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            if (data.error) {
+                if (likelyTool && toolProgress) {
+                    completeToolProgress(toolProgress, likelyTool);
+                }
+
+                botElement.textContent += "\n\nError: " + data.error;
+                statusText.textContent = "Ready";
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            if (data.done) {
+                if (likelyTool && toolProgress && !firstTokenReceived) {
+                    completeToolProgress(toolProgress, likelyTool);
+                }
+
+                statusText.textContent = "Ready";
+            }
+        }
+
+        try {
+            const response = await fetch("/chat/stream", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: message,
+                    thread_id: threadId,
+                    model: selectedModel
+                })
+            });
+
+            if (!response.ok) {
+                let errorText = "Request failed.";
+
+                try {
+                    const errorData = await response.json();
+                    errorText = errorData.detail || errorData.message || errorText;
+                } catch (error) {
+                    console.error("Could not parse error response:", error);
+                }
+
+                botElement.textContent = errorText;
+                return;
+            }
+
+            if (!response.body) {
+                botElement.textContent = "Streaming is not supported by this browser.";
+                return;
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+
+            let buffer = "";
+
+            while (true) {
+                const { value, done } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+
+                const parts = buffer.split(/\r?\n\r?\n/);
+                buffer = parts.pop() || "";
+
+                for (const part of parts) {
+                    const data = parseSSEPart(part);
+                    handleStreamData(data);
+                }
+            }
+
+            /*
+                Important fix:
+                Sometimes the final streamed response does not end with "\n\n".
+                In that case, the final data remains inside buffer.
+                This part makes sure the leftover buffer is also displayed.
+            */
+            buffer += decoder.decode();
+
+            if (buffer.trim()) {
+                const data = parseSSEPart(buffer);
+                handleStreamData(data);
+            }
+
+        } catch (error) {
+            console.error("Streaming error:", error);
+
+            if (likelyTool && toolProgress) {
+                completeToolProgress(toolProgress, likelyTool);
+            }
+
+            botElement.textContent = "Something went wrong: " + error.message;
+
+        } finally {
+            sendBtn.disabled = false;
+            statusText.textContent = "Ready";
+            messageInput.focus();
+
+            await loadConversations();
+        }
+    }
+
+    async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+
+        if (!fileInput.files.length) {
+            return;
+        }
+
+        const file = fileInput.files[0];
+
+        addMessage("user", `📎 Uploaded document: ${file.name}`);
+
+        const toolProgress = addToolProgress("Document Ingestion");
+        statusText.textContent = "Using Document Ingestion...";
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("thread_id", threadId);
+
+        try {
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            const data = await response.json();
+
+            completeToolProgress(toolProgress, "Document Ingestion");
+
+            if (data.success) {
+                addMessage(
+                    "assistant",
+                    data.message + "\n\nYou can now ask questions about this document."
+                );
+
+                await loadConversations();
+            } else {
+                addMessage("assistant", "Upload failed: " + data.message);
+            }
+
+        } catch (error) {
+            completeToolProgress(toolProgress, "Document Ingestion");
+            addMessage("assistant", "Upload failed: " + error.message);
+        }
+
+        statusText.textContent = "Ready";
+        fileInput.value = "";
+    }
+
+    async function newChat() {
+        threadId = crypto.randomUUID();
+        localStorage.setItem("thread_id", threadId);
+
+        if (isDictating) {
+            stopDictation();
+        }
+
+        renderWelcome();
+        await loadConversations();
+        messageInput.focus();
+    }
+
+    loadConversations();
+
+    if (threadId) {
+        loadConversation(threadId);
+    }
+</script>
+
+</body>
+</html>
