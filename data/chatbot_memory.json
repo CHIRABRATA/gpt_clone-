@@ -1,0 +1,91 @@
+{
+  "conversations": [
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "title": "Search the web for latest AI agent news.",
+      "created_at": "2026-08-08T18:16:25.913823",
+      "updated_at": "2026-08-08T18:25:52.947442"
+    }
+  ],
+  "chat_messages": [
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "Search the web for latest AI agent news.",
+      "created_at": "2026-08-08T18:16:25.922098"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "hii",
+      "created_at": "2026-08-08T18:16:39.479356"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "hi",
+      "created_at": "2026-08-08T18:16:54.701214"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "hii",
+      "created_at": "2026-08-08T18:17:01.051002"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "hi",
+      "created_at": "2026-08-08T18:20:20.143730"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "hi",
+      "created_at": "2026-08-08T18:23:59.494896"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "Hello. It's nice to meet you. Is there something I can help you with or would you like to chat?",
+      "created_at": "2026-08-08T18:24:00.634297"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "what is your name?",
+      "created_at": "2026-08-08T18:24:12.603325"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "My name is ChiruGPT, and I'm an AI assistant here to help answer your questions and provide information on a wide range of topics. How can I assist you today?",
+      "created_at": "2026-08-08T18:24:13.560173"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "what is this?",
+      "created_at": "2026-08-08T18:24:41.093956"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "assistant",
+      "content": "This is a conversation interface where you can ask me questions, provide me with tasks, or engage in discussion on various topics. I'm here to help and provide information to the best of my abilities. What would you like to talk about or ask?",
+      "created_at": "2026-08-08T18:24:41.988386"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "what is the document?",
+      "created_at": "2026-08-08T18:25:01.406652"
+    },
+    {
+      "thread_id": "891ba9b6-b7b6-4a67-94fc-ba15d8d6d3d1",
+      "role": "user",
+      "content": "what the content in the document?",
+      "created_at": "2026-08-08T18:25:52.947442"
+    }
+  ],
+  "long_term_memory": []
+}

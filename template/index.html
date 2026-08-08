@@ -516,11 +516,10 @@
             ></textarea>
 
             <select id="modelSelect" class="model-select" title="Select model">
-                <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro</option>
-                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
-                <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-                <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+                <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile</option>
+                <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+                <option value="mixtral-8x7b-32768">mixtral-8x7b-32768</option>
+                <option value="gemma2-9b-it">gemma2-9b-it</option>
             </select>
 
             <button class="mic-btn" id="micBtn" onclick="toggleDictation()" title="Dictate">
@@ -531,7 +530,7 @@
         </div>
 
         <div class="notice" id="noticeText">
-            BappyGPT can make mistakes. Check important info.
+            chiruGPT can make mistakes. Check important info.
         </div>
     </div>
 </main>
@@ -555,7 +554,7 @@
 
     const savedModel = localStorage.getItem("selected_model");
 
-    if (savedModel && modelSelect) {
+    if (savedModel && modelSelect && Array.from(modelSelect.options).some(option => option.value === savedModel)) {
         modelSelect.value = savedModel;
     }
 
@@ -951,7 +950,7 @@
             stopDictation();
         }
 
-        const selectedModel = modelSelect ? modelSelect.value : "gemini-2.5-flash";
+        const selectedModel = modelSelect && modelSelect.value ? modelSelect.value : "llama-3.3-70b-versatile";
 
         addMessage("user", message);
 

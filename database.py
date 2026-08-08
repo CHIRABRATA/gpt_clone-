@@ -1,183 +1,230 @@
+from dataclasses import dataclass
 from datetime import datetime
+import json
 from pathlib import Path
+from threading import Lock
 
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
-from sqlalchemy.orm import declarative_base, sessionmaker
 
 Path("data").mkdir(exist_ok=True)
 
-DATABASE_URL = "sqlite:///data/chatbot_memory.db"
-
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
-
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
-Base = declarative_base()
+STORE_PATH = Path("data/chatbot_memory.json")
+_STORE_LOCK = Lock()
 
 
-class Conversation(Base):
-    __tablename__ = "conversations"
-
-    id = Column(Integer, primary_key=True, index=True)
-    thread_id = Column(String, unique=True, index=True)
-    title = Column(String, default="New Chat")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+@dataclass(slots=True)
+class Conversation:
+    thread_id: str
+    title: str
+    created_at: datetime
+    updated_at: datetime
 
 
-class ChatMessage(Base):
-    __tablename__ = "chat_messages"
-
-    id = Column(Integer, primary_key=True, index=True)
-    thread_id = Column(String, index=True)
-    role = Column(String)
-    content = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+@dataclass(slots=True)
+class ChatMessage:
+    thread_id: str
+    role: str
+    content: str
+    created_at: datetime
 
 
-class LongTermMemory(Base):
-    __tablename__ = "long_term_memory"
+@dataclass(slots=True)
+class LongTermMemory:
+    thread_id: str
+    memory: str
+    created_at: datetime
 
-    id = Column(Integer, primary_key=True, index=True)
-    thread_id = Column(String, index=True)
-    memory = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)
+
+def _empty_store() -> dict:
+    return {
+        "conversations": [],
+        "chat_messages": [],
+        "long_term_memory": []
+    }
+
+
+def _parse_datetime(value: str) -> datetime:
+    return datetime.fromisoformat(value)
+
+
+def _load_store() -> dict:
+    if not STORE_PATH.exists():
+        return _empty_store()
+
+    try:
+        with STORE_PATH.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, json.JSONDecodeError):
+        return _empty_store()
+
+    store = _empty_store()
+
+    for key in store:
+        items = data.get(key, [])
+        if isinstance(items, list):
+            store[key] = items
+
+    return store
+
+
+def _save_store(store: dict) -> None:
+    temp_path = STORE_PATH.with_suffix(".tmp")
+
+    with temp_path.open("w", encoding="utf-8") as file:
+        json.dump(store, file, ensure_ascii=False, indent=2)
+
+    temp_path.replace(STORE_PATH)
+
+
+def _conversation_from_dict(item: dict) -> Conversation:
+    return Conversation(
+        thread_id=item["thread_id"],
+        title=item["title"],
+        created_at=_parse_datetime(item["created_at"]),
+        updated_at=_parse_datetime(item["updated_at"])
+    )
+
+
+def _message_from_dict(item: dict) -> ChatMessage:
+    return ChatMessage(
+        thread_id=item["thread_id"],
+        role=item["role"],
+        content=item["content"],
+        created_at=_parse_datetime(item["created_at"])
+    )
+
+
+def _memory_from_dict(item: dict) -> LongTermMemory:
+    return LongTermMemory(
+        thread_id=item["thread_id"],
+        memory=item["memory"],
+        created_at=_parse_datetime(item["created_at"])
+    )
 
 
 def init_db():
-    Base.metadata.create_all(bind=engine)
+    with _STORE_LOCK:
+        if not STORE_PATH.exists():
+            _save_store(_empty_store())
 
 
 def create_or_update_conversation(thread_id: str, first_message: str | None = None):
-    db = SessionLocal()
+    with _STORE_LOCK:
+        store = _load_store()
+        conversations = store["conversations"]
+        now = datetime.utcnow().isoformat()
 
-    try:
-        conversation = (
-            db.query(Conversation)
-            .filter(Conversation.thread_id == thread_id)
-            .first()
-        )
+        for conversation in conversations:
+            if conversation["thread_id"] == thread_id:
+                conversation["updated_at"] = now
+                _save_store(store)
+                return
 
-        if not conversation:
-            title = "New Chat"
+        title = "New Chat"
 
-            if first_message:
-                title = first_message.strip()[:40]
-                if len(first_message.strip()) > 40:
+        if first_message:
+            cleaned_message = first_message.strip()
+            if cleaned_message:
+                title = cleaned_message[:40]
+                if len(cleaned_message) > 40:
                     title += "..."
 
-            conversation = Conversation(
-                thread_id=thread_id,
-                title=title,
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow()
-            )
-
-            db.add(conversation)
-
-        else:
-            conversation.updated_at = datetime.utcnow()
-
-        db.commit()
-
-    finally:
-        db.close()
+        conversations.append(
+            {
+                "thread_id": thread_id,
+                "title": title,
+                "created_at": now,
+                "updated_at": now
+            }
+        )
+        _save_store(store)
 
 
 def list_conversations():
-    db = SessionLocal()
+    with _STORE_LOCK:
+        store = _load_store()
+        conversations = [
+            _conversation_from_dict(item)
+            for item in store["conversations"]
+        ]
 
-    try:
-        return (
-            db.query(Conversation)
-            .order_by(Conversation.updated_at.desc())
-            .all()
-        )
-
-    finally:
-        db.close()
+        return sorted(conversations, key=lambda item: item.updated_at, reverse=True)
 
 
 def save_chat_message(thread_id: str, role: str, content: str):
-    db = SessionLocal()
+    with _STORE_LOCK:
+        store = _load_store()
+        now = datetime.utcnow().isoformat()
 
-    try:
-        msg = ChatMessage(
-            thread_id=thread_id,
-            role=role,
-            content=content,
-            created_at=datetime.utcnow()
+        store["chat_messages"].append(
+            {
+                "thread_id": thread_id,
+                "role": role,
+                "content": content,
+                "created_at": now
+            }
         )
 
-        db.add(msg)
+        for conversation in store["conversations"]:
+            if conversation["thread_id"] == thread_id:
+                conversation["updated_at"] = now
+                break
 
-        conversation = (
-            db.query(Conversation)
-            .filter(Conversation.thread_id == thread_id)
-            .first()
-        )
-
-        if conversation:
-            conversation.updated_at = datetime.utcnow()
-
-        db.commit()
-
-    finally:
-        db.close()
+        _save_store(store)
 
 
 def get_chat_history(thread_id: str):
-    db = SessionLocal()
+    with _STORE_LOCK:
+        store = _load_store()
+        messages = [
+            _message_from_dict(item)
+            for item in store["chat_messages"]
+            if item["thread_id"] == thread_id
+        ]
 
-    try:
-        return (
-            db.query(ChatMessage)
-            .filter(ChatMessage.thread_id == thread_id)
-            .order_by(ChatMessage.created_at.asc())
-            .all()
-        )
-
-    finally:
-        db.close()
+        return sorted(messages, key=lambda item: item.created_at)
 
 
 def save_memory(thread_id: str, memory: str):
-    db = SessionLocal()
+    with _STORE_LOCK:
+        store = _load_store()
 
-    try:
-        item = LongTermMemory(
-            thread_id=thread_id,
-            memory=memory,
-            created_at=datetime.utcnow()
+        store["long_term_memory"].append(
+            {
+                "thread_id": thread_id,
+                "memory": memory,
+                "created_at": datetime.utcnow().isoformat()
+            }
         )
 
-        db.add(item)
-        db.commit()
-
+        _save_store(store)
         return "Memory saved successfully."
-
-    finally:
-        db.close()
 
 
 def search_memory(thread_id: str, query: str):
-    db = SessionLocal()
-
-    try:
-        memories = (
-            db.query(LongTermMemory)
-            .filter(LongTermMemory.thread_id == thread_id)
-            .order_by(LongTermMemory.created_at.desc())
-            .limit(20)
-            .all()
-        )
+    with _STORE_LOCK:
+        store = _load_store()
+        memories = [
+            _memory_from_dict(item)
+            for item in store["long_term_memory"]
+            if item["thread_id"] == thread_id
+        ]
 
         if not memories:
             return "No saved memory found."
 
-        return "\n".join([f"- {m.memory}" for m in memories])
+        query = query.strip().lower()
+        if query:
+            matched_memories = [
+                memory for memory in memories
+                if query in memory.memory.lower()
+            ]
+            if matched_memories:
+                memories = matched_memories
 
-    finally:
-        db.close()
+        recent_memories = sorted(
+            memories,
+            key=lambda item: item.created_at,
+            reverse=True
+        )[:20]
+
+        return "\n".join([f"- {memory.memory}" for memory in recent_memories])

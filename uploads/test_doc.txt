@@ -1,0 +1,1 @@
+Invoice 123 total amount is 450 dollars. Payment due Friday.

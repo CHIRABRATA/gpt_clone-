@@ -1,34 +1,33 @@
 import os
-import sqlite3
 from pathlib import Path
 
 from dotenv import load_dotenv
 import certifi
+
+from langgraph.checkpoint.memory import MemorySaver
 
 load_dotenv()
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage
 from langgraph.graph import StateGraph, START, MessagesState
 from langgraph.prebuilt import ToolNode, tools_condition
-from langgraph.checkpoint.sqlite import SqliteSaver
 from tools import tools
 
 Path("data").mkdir(exist_ok=True)
 
 
-# Update default and allowed models to use Gemini 2.5
-DEFAULT_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+# Update default and allowed models to use Groq chat models
+DEFAULT_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 ALLOWED_MODELS = {
-    "gemini-2.5-flash",
-    "gemini-2.5-pro",
-    "gemini-2.5-flash-lite", # Included the lite version if needed
-    "gemini-1.5-flash",      # Kept for fallback compatibility 
-    "gemini-1.5-pro"
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it",
 }
 
 
@@ -78,13 +77,12 @@ def normalize_model_name(model_name: str | None) -> str:
 
 def build_agent(model_name: str):
     """
-    Build one LangGraph agent for a selected Gemini model.
+    Build one LangGraph agent for a selected Groq model.
     """
 
     selected_model = normalize_model_name(model_name)
 
-    # Initialize ChatGoogleGenerativeAI
-    llm = ChatGoogleGenerativeAI(
+    llm = ChatGroq(
         model=selected_model,
         temperature=0.3,
         streaming=True
@@ -112,12 +110,7 @@ def build_agent(model_name: str):
     workflow.add_conditional_edges("chatbot", tools_condition)
     workflow.add_edge("tools", "chatbot")
 
-    conn = sqlite3.connect(
-        "data/langgraph_checkpoints.sqlite",
-        check_same_thread=False
-    )
-
-    checkpointer = SqliteSaver(conn)
+    checkpointer = MemorySaver()
 
     return workflow.compile(checkpointer=checkpointer)
 

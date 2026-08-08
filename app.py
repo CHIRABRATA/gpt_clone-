@@ -37,7 +37,11 @@ from tools import set_current_thread_id
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory="templates")
+BASE_DIR = Path(__file__).resolve().parent
+templates_dir = BASE_DIR / "templates"
+if not templates_dir.exists():
+    templates_dir = BASE_DIR / "template"
+templates = Jinja2Templates(directory=str(templates_dir))
 
 Path("uploads").mkdir(exist_ok=True)
 Path("data").mkdir(exist_ok=True)
@@ -226,7 +230,7 @@ async def chat_stream(request: Request):
 
     user_message = data.get("message", "")
     thread_id = data.get("thread_id", "default")
-    selected_model = data.get("model", "gemini-2.5-flash")
+    selected_model = data.get("model", "llama-3.3-70b-versatile")
 
     if not user_message.strip():
         return JSONResponse(
@@ -298,7 +302,7 @@ if __name__ == "__main__":
    
     uvicorn.run(
         "app:app",
-        host="0.0.0.0",
+        host="127.0.0.1",
         port=8080,
         reload=True
     )
