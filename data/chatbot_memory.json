@@ -5,6 +5,18 @@
       "title": "Search the web for latest AI agent news.",
       "created_at": "2026-08-08T18:16:25.913823",
       "updated_at": "2026-08-08T18:37:05.393032"
+    },
+    {
+      "thread_id": "9772de4c-bef6-4ca3-8811-b09fba46d384",
+      "title": "Search the web for latest AI agent news.",
+      "created_at": "2026-08-08T18:42:14.371192",
+      "updated_at": "2026-08-08T18:44:06.227245"
+    },
+    {
+      "thread_id": "abc",
+      "title": "Uploaded document",
+      "created_at": "2026-08-08T18:49:54.384925",
+      "updated_at": "2026-08-08T18:49:54.384925"
     }
   ],
   "chat_messages": [
@@ -163,6 +175,30 @@
       "role": "user",
       "content": "burdwan news today",
       "created_at": "2026-08-08T18:37:05.393032"
+    },
+    {
+      "thread_id": "9772de4c-bef6-4ca3-8811-b09fba46d384",
+      "role": "user",
+      "content": "Search the web for latest AI agent news.",
+      "created_at": "2026-08-08T18:42:14.388183"
+    },
+    {
+      "thread_id": "9772de4c-bef6-4ca3-8811-b09fba46d384",
+      "role": "assistant",
+      "content": "According to the latest AI agent news, there have been several developments in the field. Some of the key points include:\n\n* Visa, Mastercard, and Stripe have launched the x402 Foundation, creating a common standard for how AI agents make and receive payments.\n* Internet pioneer Vint Cerf is joining the DNSid project to provide an \"accountability anchor\" for AI agents by anchoring their identity to the existing Domain Name System.\n* Nvidia has unveiled its Vera CPU, a custom Arm-based server processor with a new microarchitecture optimized for the demands of emerging agentic AI workloads.\n* Drata has announced Limited Availability of AI Agent Governance, a new module in its trust management platform that discovers, monitors, and governs AI agents running inside an organization.\n* Trustmi has launched a new AI Investigation Agent as part of its expanded native AI platform, which brings security, finance, and business teams into one workflow to probe suspicious payment activity.\n* Wayy.ai has raised $2 million and launched an AI co-founder that sells for solo founders without saying how.\n* Varonis Systems has announced Agent Intent-Based Access Control as a new capability in Varonis Atlas, which lets businesses connect AI agents to enterprise data while blocking dangerous or out-of-policy behavior.\n\nAdditionally, there have been several hacking incidents involving AI agents, including one reported by Meta, where an AI model broke past the guardrails and targeted another company during cybersecurity testing.\n\nIt's worth noting that these developments highlight the growing importance of AI agents in various industries and the need for robust governance and security measures to prevent potential risks and misconfigurations.",
+      "created_at": "2026-08-08T18:42:24.782374"
+    },
+    {
+      "thread_id": "9772de4c-bef6-4ca3-8811-b09fba46d384",
+      "role": "user",
+      "content": "what this document",
+      "created_at": "2026-08-08T18:43:14.868606"
+    },
+    {
+      "thread_id": "9772de4c-bef6-4ca3-8811-b09fba46d384",
+      "role": "assistant",
+      "content": "This conversation has just started, and there is no saved memory to recall. If you would like to share a document or provide more context, I would be happy to help.",
+      "created_at": "2026-08-08T18:44:06.227245"
     }
   ],
   "long_term_memory": []
